@@ -1,0 +1,11 @@
+{
+  "name": "Color Swatch",
+  "id": "1109318554624490060",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": [
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0"
+}
