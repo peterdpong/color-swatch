@@ -9,8 +9,14 @@ function Widget() {
   })
   const [editHex, setEditHex] = useSyncedState('edithex', false)
 
-  let colorMatch: ntcResult | undefined = NTC.getNameFromHexCode(hexCode);
+  let colorMatch: ntcResult | undefined = NTC.getNameFromHexCode(hexCode.substring(1));
   let editStroke = editHex ? '#1c1c1c' : "#ffffff";
+
+  if(colorMatch === undefined) {
+    let randomHex = "#FF9B71"
+    colorMatch = NTC.getNameFromHexCode(randomHex.substring(1));
+    colorMatch.colorName = "Invalid Hex Code!"
+  }
 
   return (
     <AutoLayout
@@ -26,7 +32,7 @@ function Widget() {
     <Rectangle
       width={160}
       height={160}
-      fill={hexCode}
+      fill={colorMatch.hexCode}
      />
 
       <AutoLayout
@@ -107,33 +113,33 @@ class ntc {
       let cl = -1;
       let df = -1;
 
-    this.colorNames.forEach((colorName: string[], index: number) => {
-      if(hexCode === "#" + colorName[0]) {
+    for(let i: number = 0; i < this.colorNames.length; i++) {
+      if(hexCode === "#" + this.colorNames[i][0]) {
         return {
           hexCode: hexCode, 
-          colorName: colorName[1], 
+          colorName: this.colorNames[i][1], 
           rgb: rgb, 
           hsl: hsl,
           isExactMatch: true
         };
       }
 
-      ndf1 = Math.pow(rgb[0] - this.colorNames[index][2], 2) + Math.pow(rgb[1] - this.colorNames[index][3], 2) + Math.pow(rgb[2] - this.colorNames[index][4], 2);
-      ndf1 = Math.pow(hsl[0] - this.colorNames[index][5], 2) + Math.pow(hsl[1] - this.colorNames[index][6], 2) + Math.pow(hsl[2] - this.colorNames[index][7], 2);
+      ndf1 = Math.pow(rgb[0] - this.colorNames[i][2], 2) + Math.pow(rgb[1] - this.colorNames[i][3], 2) + Math.pow(rgb[2] - this.colorNames[i][4], 2);
+      ndf1 = Math.pow(hsl[0] - this.colorNames[i][5], 2) + Math.pow(hsl[1] - this.colorNames[i][6], 2) + Math.pow(hsl[2] - this.colorNames[i][7], 2);
       ndf = ndf1 + ndf2 * 2;
 
       if (df < 0 || df > ndf) {
         df = ndf;
-        cl = index;
+        cl = i;
       }
-    });
+    }
 
     if(cl < 0) {
       return undefined;
     }
 
     return {
-      hexCode: this.colorNames[cl][0],
+      hexCode: hexCode,
       colorName: this.colorNames[cl][1],
       rgb: rgb,
       hsl: hsl,
@@ -155,9 +161,9 @@ class ntc {
 
   toHSL(hexCode: string): number[] {
     let rgb: number[] = this.toRGB(hexCode);
-    let r: number = rgb[0];
-    let g: number = rgb[1];
-    let b: number = rgb[2];
+    let r: number = rgb[0] / 255;
+    let g: number = rgb[1] / 255;
+    let b: number = rgb[2] / 255;
     let min: number, max: number, delta: number, h: number, s: number, l: number;
 
     min = Math.min(r, Math.min(g, b));
