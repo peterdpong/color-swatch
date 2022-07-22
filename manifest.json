@@ -2,8 +2,9 @@
   "name": "Color Swatch",
   "id": "1109318554624490060",
   "api": "1.0.0",
-  "main": "code.js",
-  "editorType": ["figma", "figjam"],
+  "editorType": ["figma","figjam"],
+  "permissions": [],
   "containsWidget": true,
+  "main": "dist/code.js",
   "widgetApi": "1.0.0"
 }
