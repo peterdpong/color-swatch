@@ -6,13 +6,16 @@ const { useSyncedState, usePropertyMenu, AutoLayout, Rectangle, Text, Input } = 
 function Widget() {
   const NTC: ntc = new ntc();
   const startColors = ['#FF9B71', '#9C89B8', '#FC6471', '#E9806E']
+  const [overrideName, setOverrideName] = useSyncedState('overrideName', "");
   const [hexCode, setHexcode] = useSyncedState('hexcode', () => {
     return startColors[Math.floor(Math.random() * startColors.length)]
   })
-  const [editHex, setEditHex] = useSyncedState('edithex', false)
+  const [editName, setEditName] = useSyncedState('editName', false);
+  const [editHex, setEditHex] = useSyncedState('editHex', false)
 
   let colorMatch: ntcResult | undefined = NTC.getNameFromHexCode(hexCode.substring(1));
   let editStroke = editHex ? '#1c1c1c' : "#ffffff";
+  let colorStroke = editName ? '#1c1c1c' : "#ffffff";
 
   if(colorMatch === undefined) {
     let randomHex = "#FF9B71"
@@ -42,13 +45,30 @@ function Widget() {
       direction={'vertical'}
       padding={{right: 2, left: 2}}
       >
-          <Text fontSize={15} width={150}>{colorMatch!.colorName}</Text>
+          <AutoLayout width={156} cornerRadius={4} stroke={colorStroke}>
+            {editName ? <Input
+            value={overrideName.length !== 0 ? overrideName : colorMatch!.colorName}
+            fontSize={15}
+            onTextEditEnd={(input: TextEditEvent) => {
+              if(input.characters.length === 0) {
+                // Reset name
+                setOverrideName("");
+              } else {
+                setOverrideName(input.characters)
+              }
+              setEditName(false)
+            }}
+            /> : <Text fontSize={15} hoverStyle={{fill: '#6b6b6b'}} onClick={() => {
+              setEditName(true)
+            }}>{overrideName.length !== 0 ? overrideName : colorMatch!.colorName}</Text>}
+          </AutoLayout>
           <AutoLayout width={156} cornerRadius={4} stroke={editStroke}>
             {editHex ? <Input
             value={hexCode}
             fontSize={15}
             onTextEditEnd={(input: TextEditEvent) => {
               setHexcode(input.characters)
+              setOverrideName("")
               setEditHex(false)
             }}
             /> : <Text fontSize={15} hoverStyle={{fill: '#6b6b6b'}} onClick={() => {
