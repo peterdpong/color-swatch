@@ -1,8 +1,7 @@
-# @figma/create-widget
+## Color Swatch widget for FigJam and Figma
+[Figma Community Page](https://www.figma.com/community/widget/1109318554624490060)
 
-This repo was created by @figma/create-widget
-
-## Getting started with widget development
+## Starting widget for local development
 
 Run the following command to start building your widget
 
