@@ -3,23 +3,17 @@ import { ntc, ntcResult } from "./ntc";
 const { widget } = figma
 const { useSyncedState, AutoLayout, Rectangle, Text, Input } = widget
 
+function getRandomHex() {
+  // Hacky solution to obtain random number since Math.Random is restricted
+  return Math.floor(((Date.now() * 16807 % 2147483647) / 2147483647) * 16777215).toString(16);
+}
+
 function Widget() {
   const NTC: ntc = new ntc();
-  const startColors = ['#FF9B71', '#9C89B8', '#FC6471', '#E9806E']
   const [overrideName, setOverrideName] = useSyncedState('overrideName', "");
-  const [hexCode, setHexcode] = useSyncedState('hexcode', () => {
-    return startColors[Math.floor(Math.random() * startColors.length)]
-  })
-  const [editName, setEditName] = useSyncedState('editName', false);
-  const [editHex, setEditHex] = useSyncedState('editHex', false)
+  const [hexCode, setHexcode] = useSyncedState('hexcode', '#' + getRandomHex())
 
   let colorMatch: ntcResult | undefined = NTC.getNameFromHexCode(hexCode.substring(1));
-  const editInputFrameProps = {
-    fill: "#f5f5f5",
-    stroke: "#808080",
-    cornerRadius: 4,
-    padding: 1,
-  };
 
   if(colorMatch === undefined) {
     let randomHex = "#FF9B71"
@@ -34,24 +28,32 @@ function Widget() {
       fill={'#FFFFFF'}
       stroke={'#1c1c1c'}
       strokeWidth={2}
-      strokeAlign={'outside'}
+      strokeAlign={'inside'}
       cornerRadius={4}
-      spacing={2}
     > 
       <Rectangle
-        width={160}
-        height={160}
-        fill={colorMatch!.hexCode}
+        width={162}
+        height={150}
+        fill={hexCode}
+      />
+      <Rectangle
+        width={162}
+        height={2}
+        fill={'#1c1c1c'}
       />
 
-      <AutoLayout verticalAlignItems={'center'} direction={'vertical'} padding={{left: 2, right: 2}} spacing={1}>
-        {editName ? 
-          <Input
+      <AutoLayout verticalAlignItems={'center'} direction={'vertical'} padding={{top: 2, bottom: 2, left: 4, right: 4}} spacing={1}>
+      <Input
             value={overrideName.length !== 0 ? overrideName : colorMatch!.colorName}
             fontSize={15}
             width={156}
+            inputFrameProps={{
+              stroke: "#ffffff",
+              cornerRadius: 2,
+              padding: 1.5,
+              hoverStyle: {stroke: '#1c1c1c'}
+            }}
             inputBehavior={'truncate'}
-            inputFrameProps={editInputFrameProps}
             onTextEditEnd={(input: TextEditEvent) => {
               if(input.characters.length === 0) {
                 // Reset name
@@ -59,32 +61,25 @@ function Widget() {
               } else {
                 setOverrideName(input.characters)
               }
-              setEditName(false)
             }}
-          /> : <AutoLayout padding={1}>
-            <Text fontSize={15} hoverStyle={{fill: '#6b6b6b'}} onClick={() => {
-              setEditName(true)
-            }}>{overrideName.length !== 0 ? overrideName : colorMatch!.colorName}</Text>
-          </AutoLayout>
+          /> 
         
-        }
 
-        {editHex ? <Input
-          value={hexCode}
+        <Input
+          value={hexCode.toLocaleUpperCase()}
           fontSize={15}
           width={156}
-          inputFrameProps={editInputFrameProps}
+          inputFrameProps={{
+            stroke: "#ffffff",
+            cornerRadius: 2,
+            padding: 1.5,
+            hoverStyle: {stroke: '#1c1c1c'}
+          }}
           onTextEditEnd={(input: TextEditEvent) => {
             setHexcode(input.characters)
             setOverrideName("")
-            setEditHex(false)
           }}
-          /> : <AutoLayout padding={1}>
-            <Text fontSize={15} hoverStyle={{fill: '#6b6b6b'}} onClick={() => {
-              setEditHex(true)
-            }}>{hexCode}</Text>
-          </AutoLayout>
-        }
+          />
 
         <Text fontSize={15}>{`R: ${colorMatch!.rgb[0]} G: ${colorMatch!.rgb[1]} B: ${colorMatch!.rgb[2]}`}</Text>
       </AutoLayout>
