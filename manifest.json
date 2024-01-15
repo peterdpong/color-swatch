@@ -6,5 +6,6 @@
   "permissions": [],
   "containsWidget": true,
   "main": "dist/code.js",
-  "widgetApi": "1.0.0"
+  "widgetApi": "1.0.0",
+  "networkAccess": { "allowedDomains": ["none"] }
 }
